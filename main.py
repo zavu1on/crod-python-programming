@@ -1,13 +1,25 @@
 import pygame
 import time
+pygame.init()
 
 win = pygame.display.set_mode((500, 500))
 wall = pygame.Rect(0, 460, 500, 40)
-block1 = pygame.Rect(200, 400, 100, 40)
-block2 = pygame.Rect(330, 320, 100, 40)
-block3 = pygame.Rect(50, 220, 100, 40)
-block4 = pygame.Rect(380, 120, 100, 40)
+blocks = [
+    pygame.Rect(200, 400, 100, 40),
+    pygame.Rect(330, 320, 100, 40),
+    pygame.Rect(50, 220, 100, 40),
+    pygame.Rect(380, 120, 100, 40),
+]
 hero = pygame.Rect(50, 300, 50, 50)
+apple = pygame.Rect(100, 30, 30, 30)
+
+hero_image = pygame.image.load('assets/hero.png')
+block_image = pygame.image.load('assets/block.png')
+bg_image = pygame.image.load('assets/bg.png')
+apple_image = pygame.image.load('assets/apple.png')
+font = pygame.font.SysFont('Arial', 32)
+
+is_finished = False
 clock = pygame.time.Clock()
 
 t = 1
@@ -36,13 +48,17 @@ while True:
                 if event.key == pygame.K_LEFT:
                     v_x = -v_x
 
-    win.fill(0xdddddd)
-    pygame.draw.rect(win, 0x00ff77, wall)
-    pygame.draw.rect(win, 0xdd5f5f, hero)
-    pygame.draw.rect(win, 0x3d3dff, block1)
-    pygame.draw.rect(win, 0x3d3dff, block2)
-    pygame.draw.rect(win, 0x3d3dff, block3)
-    pygame.draw.rect(win, 0x3d3dff, block4)
+    win.blit(bg_image, [0, 0])
+    pygame.draw.rect(win, [40, 40, 80], wall)
+    win.blit(hero_image, hero)
+    win.blit(apple_image, apple)
+
+    for block in blocks:
+        win.blit(block_image, block)
+
+    if is_finished:
+        text = font.render('Вы прошли игру!!!', True, (255, 255, 255))
+        win.blit(text, [10, 50])
 
     s_y = v_y * t + 0.5 * g_y * (t ** 2)
     s_x = v_x * t
@@ -57,25 +73,16 @@ while True:
         v_y = 0
         v_x = 0
         hero.y = wall.y - hero.h
-    elif hero.colliderect(block1):
-        g_y = 0
-        v_y = 0
-        v_x = 0
-        hero.y = block1.y - hero.h
-    elif hero.colliderect(block2):
-        g_y = 0
-        v_y = 0
-        v_x = 0
-        hero.y = block2.y - hero.h
-    elif hero.colliderect(block3):
-        g_y = 0
-        v_y = 0
-        v_x = 0
-        hero.y = block3.y - hero.h
-    elif hero.colliderect(block4):
-        g_y = 0
-        v_y = 0
-        v_x = 0
-        hero.y = block4.y - hero.h
+
+    if hero.colliderect(apple):
+        print('Вы прошли игру!!!')
+        is_finished = True
+
+    for block in blocks:
+        if hero.colliderect(block):
+            g_y = 0
+            v_y = 0
+            v_x = 0
+            hero.y = block.y - hero.h
 
     pygame.display.update()
